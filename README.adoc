@@ -1,0 +1,48 @@
+= About this repo
+
+This is a reproduction to showcase a failed test where I am unable to override `navigateTo` with a mock / spy.
+
+== Use Case
+
+Use Case is to write a test for a plugin which provides a custom fetch method.
+
+The custom fetch (which is pretty much the same as https://nuxt.com/docs/guide/recipes/custom-usefetch[the one in the "official" nuxt recipe]) registers
+a response interceptor which redirects to /login using Nuxt's `navigateTo`-method when the api responds with a 401 UNAUTHORIZED status.
+
+== The issue
+
+To make sure that the functionality works, I want to verify it with a test.
+For this purpose, I want to use the real `$api` method which is provided by the plugin.
+
+In the test, I want to be able to verify that the navigation is correctly invoked.
+
+For that purpose, I want to verify that the navigateTo-mock was invoked with the correct parameters.
+
+However, it seems that the mock is not being "injected" correctly because I receive following error message from vitest.
+
+[source,text]
+----
+ ❯ plugins/__tests__/customFetch-with-navigateTo-mock.nuxt.spec.ts (1 test | 1 failed) 13ms
+   × Custom Open Fetch with mocked navigateTo > should redirect when fetch not successful and status is 401 12ms
+     → expected "spy" to be called at least once
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  plugins/__tests__/customFetch-with-navigateTo-mock.nuxt.spec.ts > Custom Open Fetch with mocked navigateTo > should redirect when fetch not successful and status is 401
+AssertionError: expected "spy" to be called at least once
+ ❯ eval plugins/__tests__/customFetch-with-navigateTo-mock.nuxt.spec.ts:35:3
+     33|   })).rejects.toThrowError();
+     34| 
+     35|   expect(navigateToMock).toHaveBeenCalled();
+       |   ^
+     36|   });
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:37:37
+   Duration  592ms
+----

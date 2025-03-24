@@ -23,7 +23,7 @@ registerEndpoint(endpointPath, {
   }
 });
 
-describe('Custom Open Fetch Clients', () => { 
+describe('Custom Open Fetch with mocked navigateTo', () => { 
   it('should redirect when fetch not successful and status is 401', async () => {
 
   const { $api } = useNuxtApp();
